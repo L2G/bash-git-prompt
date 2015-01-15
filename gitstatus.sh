@@ -84,8 +84,12 @@ else
     has_remote_tracking=1
   fi
 
-  # get the revision list, and count the leading "<" and ">"
-  revgit=`git rev-list --left-right ${remote_ref}...HEAD`
+  # Get the revision list, and count the leading "<" and ">".
+  # Account for the possibility that there are no revisions
+  # (in which case Git throws a fatal error).
+  revgit=`git rev-list --left-right ${remote_ref}...HEAD 2>&1`
+  [ $? != 0 ] && revgit=""
+
   num_revs=`all_lines "$revgit"`
   num_ahead=`count_lines "$revgit" "^>"`
   num_behind=$(( num_revs - num_ahead ))
