@@ -1,6 +1,7 @@
 #!/usr/bin/env bats
 
-gitstatus=${BATS_TEST_DIRNAME}/../gitstatus.sh
+load test_helpers
+
 git_test_dir="`mktemp -d $BATS_TMPDIR/bash-git-prompt-test.XXXXX`"
 
 setup() {
@@ -13,7 +14,7 @@ teardown() {
   [ -d "$git_test_dir" ] && rm -rvf "$git_test_dir"
 }
 
-@test "gitstatus with a new, empty Git repo" {
+@test "${gitstatus_basename} with a new, empty Git repo" {
   cd "$git_test_dir"  
   run "${gitstatus}"
   echo "$output" >&2

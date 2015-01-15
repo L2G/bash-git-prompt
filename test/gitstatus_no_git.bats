@@ -1,8 +1,8 @@
 #!/usr/bin/env bats
 
-gitstatus=${BATS_TEST_DIRNAME}/../gitstatus.sh
+load test_helpers
 
-@test "Running gitstatus.sh" {
+@test "${gitstatus_basename} with no Git repo" {
   pushd "$BATS_TMPDIR"
   run ${gitstatus}
   [ "$status" -eq 0 ]
