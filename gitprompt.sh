@@ -192,6 +192,12 @@ git_prompt_reset() {
 function git_prompt_set_venv() {
   unset GIT_PROMPT_VENV
 
+  # Call a hook script if one is defined
+  [[ -e "$GIT_PROMPT_VENV_HOOK" ]] && source "$GIT_PROMPT_VENV_HOOK"
+
+  # Stop here and return if the hook set the value
+  [[ -n "$GIT_PROMPT_VENV" ]] && return
+
   # Virtualenv (https://pypi.python.org/pypi/virtualenv)
   if [[ -n "$VIRTUAL_ENV" ]]; then
     GIT_PROMPT_VENV=$(basename "${VIRTUAL_ENV}")
