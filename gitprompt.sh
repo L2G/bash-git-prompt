@@ -185,6 +185,24 @@ git_prompt_reset() {
   done
 }
 
+# git_prompt_set_venv
+#
+# set GIT_PROMPT_VENV to a string representing the current virtual environment, if any.
+
+function git_prompt_set_venv() {
+  unset GIT_PROMPT_VENV
+
+  # Virtualenv (https://pypi.python.org/pypi/virtualenv)
+  if [[ -n "$VIRTUAL_ENV" ]]; then
+    GIT_PROMPT_VENV=$(basename "${VIRTUAL_ENV}")
+  fi
+
+  # Conda (https://pypi.python.org/pypi/conda)
+  if [[ -n "$CONDA_DEFAULT_ENV" ]]; then
+    GIT_PROMPT_VENV=$(basename "${CONDA_DEFAULT_ENV}")
+  fi
+}
+
 function git_prompt_config()
 {
   #Checking if root to change output
@@ -252,13 +270,9 @@ function git_prompt_config()
     EMPTY_PROMPT="$OLD_GITPROMPT"
   else
     local ps=""
-    if [[ -n "$VIRTUAL_ENV" ]]; then
-      VENV=$(basename "${VIRTUAL_ENV}")
-      ps="${ps}${GIT_PROMPT_VIRTUALENV//_VIRTUALENV_/${VENV}}"
-    fi
-    if [[ -n "$CONDA_DEFAULT_ENV" ]]; then
-      VENV=$(basename "${CONDA_DEFAULT_ENV}")
-      ps="${ps}${GIT_PROMPT_VIRTUALENV//_VIRTUALENV_/${VENV}}"
+    git_prompt_set_venv
+    if [[ -n "$GIT_PROMPT_VENV" ]]; then
+      ps="${ps}${GIT_PROMPT_VIRTUALENV//_VIRTUALENV_/${GIT_PROMPT_VENV}}"
     fi
     ps="$ps$PROMPT_START$($prompt_callback)$PROMPT_END"
     EMPTY_PROMPT="${ps//_LAST_COMMAND_INDICATOR_/${LAST_COMMAND_INDICATOR}}"
@@ -437,14 +451,9 @@ function updatePrompt() {
     __add_status        "$ResetColor$GIT_PROMPT_SUFFIX"
 
     NEW_PROMPT=""
-    if [[ -n "$VIRTUAL_ENV" ]]; then
-      VENV=$(basename "${VIRTUAL_ENV}")
-      NEW_PROMPT="$NEW_PROMPT${GIT_PROMPT_VIRTUALENV//_VIRTUALENV_/${VENV}}"
-    fi
-
-    if [[ -n "$CONDA_DEFAULT_ENV" ]]; then
-      VENV=$(basename "${CONDA_DEFAULT_ENV}")
-      NEW_PROMPT="$NEW_PROMPT${GIT_PROMPT_VIRTUALENV//_VIRTUALENV_/${VENV}}"
+    git_prompt_set_venv
+    if [[ -n "$GIT_PROMPT_VENV" ]]; then
+      NEW_PROMPT="$NEW_PROMPT${GIT_PROMPT_VIRTUALENV//_VIRTUALENV_/${GIT_PROMPT_VENV}}"
     fi
 
     NEW_PROMPT="$NEW_PROMPT$PROMPT_START$($prompt_callback)$STATUS$PROMPT_END"
